@@ -1,0 +1,111 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>Smart Crop Advisor</title>
+
+  <style>
+    body {
+      font-family: 'Segoe UI', sans-serif;
+      background: linear-gradient(135deg, #11998e, #38ef7d);
+      margin: 0;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      height: 100vh;
+    }
+
+    .container {
+      background: white;
+      padding: 30px;
+      border-radius: 15px;
+      width: 360px;
+      box-shadow: 0 15px 40px rgba(0,0,0,0.2);
+      text-align: center;
+      animation: fadeIn 0.8s ease;
+    }
+
+    h1 {
+      color: #2e7d32;
+      margin-bottom: 20px;
+    }
+
+    input {
+      width: 92%;
+      padding: 10px;
+      margin: 6px 0;
+      border-radius: 8px;
+      border: 1px solid #ccc;
+      transition: 0.3s;
+    }
+
+    input:focus {
+      border-color: #2e7d32;
+      box-shadow: 0 0 6px #38ef7d;
+    }
+
+    button {
+      width: 95%;
+      padding: 12px;
+      margin-top: 12px;
+      border: none;
+      border-radius: 8px;
+      background: #2e7d32;
+      color: white;
+      font-size: 16px;
+      cursor: pointer;
+      transition: 0.3s;
+    }
+
+    button:hover {
+      transform: scale(1.05);
+      background: #1b5e20;
+    }
+
+    .result-box {
+      margin-top: 15px;
+      padding: 12px;
+      border-radius: 10px;
+      background: #f1f8e9;
+      font-size: 16px;
+      opacity: 0;
+      transform: translateY(10px);
+      transition: all 0.4s ease;
+    }
+
+    .show {
+      opacity: 1;
+      transform: translateY(0);
+    }
+
+    @keyframes fadeIn {
+      from {opacity: 0; transform: translateY(20px);}
+      to {opacity: 1; transform: translateY(0);}
+    }
+
+  </style>
+</head>
+
+<body>
+
+<div class="container">
+  <h1>🌾 Smart Crop Advisor</h1>
+
+  <input id="N" placeholder="Nitrogen (N)">
+  <input id="P" placeholder="Phosphorus (P)">
+  <input id="K" placeholder="Potassium (K)">
+  <input id="temp" placeholder="Temperature">
+  <input id="humidity" placeholder="Humidity">
+  <input id="ph" placeholder="pH">
+  <input id="rainfall" placeholder="Rainfall">
+
+  <button onclick="predict()">🚀 Analyze Farm</button>
+
+  <div id="result" class="result-box"></div>
+  <div id="fertilizer" class="result-box"></div>
+  <div id="water" class="result-box"></div>
+</div>
+
+<script src="script.js"></script>
+
+</body>
+</html>
