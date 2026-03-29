@@ -9,6 +9,8 @@ async function predict() {
   const fertBox = document.getElementById("fertilizer");
   const waterBox = document.getElementById("water");
 
+  const BASE_URL = "https://smart-crop-advisory-system-2.onrender.com";
+
   const data = {
     N: Number(document.getElementById("N").value),
     P: Number(document.getElementById("P").value),
@@ -24,8 +26,8 @@ async function predict() {
   waterBox.innerHTML = "";
 
   try {
-    // Crop
-    const res = await fetch("http://localhost:8000/predict", {
+    // 🌱 Crop Prediction
+    const res = await fetch(`${BASE_URL}/predict`, {
       method: "POST",
       headers: {"Content-Type": "application/json"},
       body: JSON.stringify(data)
@@ -36,8 +38,8 @@ async function predict() {
 
     showBox(resultBox, `🌱 Crop: <b>${crop}</b>`);
 
-    // Fertilizer
-    const fertRes = await fetch("http://localhost:8000/fertilizer", {
+    // 🧪 Fertilizer
+    const fertRes = await fetch(`${BASE_URL}/fertilizer`, {
       method: "POST",
       headers: {"Content-Type": "application/json"},
       body: JSON.stringify({ crop })
@@ -46,8 +48,8 @@ async function predict() {
     const fertData = await fertRes.json();
     showBox(fertBox, `🧪 ${fertData.recommended_fertilizer}`);
 
-    // Water
-    const waterRes = await fetch("http://localhost:8000/water", {
+    // 💧 Water Advice
+    const waterRes = await fetch(`${BASE_URL}/water`, {
       method: "POST",
       headers: {"Content-Type": "application/json"},
       body: JSON.stringify({ rainfall: data.rainfall })
@@ -58,5 +60,6 @@ async function predict() {
 
   } catch (err) {
     showBox(resultBox, "❌ Server Error");
+    console.error(err);
   }
 }
