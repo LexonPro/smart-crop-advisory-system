@@ -1,111 +1,322 @@
 <!DOCTYPE html>
-<html>
+<html lang="en">
 <head>
-  <title>Smart Crop Advisor</title>
-
-  <style>
-    body {
-      font-family: 'Segoe UI', sans-serif;
-      background: linear-gradient(135deg, #11998e, #38ef7d);
-      margin: 0;
-      display: flex;
-      justify-content: center;
-      align-items: center;
-      height: 100vh;
-    }
-
-    .container {
-      background: white;
-      padding: 30px;
-      border-radius: 15px;
-      width: 360px;
-      box-shadow: 0 15px 40px rgba(0,0,0,0.2);
-      text-align: center;
-      animation: fadeIn 0.8s ease;
-    }
-
-    h1 {
-      color: #2e7d32;
-      margin-bottom: 20px;
-    }
-
-    input {
-      width: 92%;
-      padding: 10px;
-      margin: 6px 0;
-      border-radius: 8px;
-      border: 1px solid #ccc;
-      transition: 0.3s;
-    }
-
-    input:focus {
-      border-color: #2e7d32;
-      box-shadow: 0 0 6px #38ef7d;
-    }
-
-    button {
-      width: 95%;
-      padding: 12px;
-      margin-top: 12px;
-      border: none;
-      border-radius: 8px;
-      background: #2e7d32;
-      color: white;
-      font-size: 16px;
-      cursor: pointer;
-      transition: 0.3s;
-    }
-
-    button:hover {
-      transform: scale(1.05);
-      background: #1b5e20;
-    }
-
-    .result-box {
-      margin-top: 15px;
-      padding: 12px;
-      border-radius: 10px;
-      background: #f1f8e9;
-      font-size: 16px;
-      opacity: 0;
-      transform: translateY(10px);
-      transition: all 0.4s ease;
-    }
-
-    .show {
-      opacity: 1;
-      transform: translateY(0);
-    }
-
-    @keyframes fadeIn {
-      from {opacity: 0; transform: translateY(20px);}
-      to {opacity: 1; transform: translateY(0);}
-    }
-
-  </style>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Smart Crop Advisory System</title>
+  <link rel="stylesheet" href="style.css" />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;600;700;800&family=DM+Sans:ital,wght@0,300;0,400;0,500;1,300&display=swap" rel="stylesheet" />
+  <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
 </head>
-
 <body>
 
-<div class="container">
-  <h1>🌾 Smart Crop Advisor</h1>
+  <!-- ======================== NAVBAR ======================== -->
+  <nav class="navbar" id="navbar">
+    <div class="nav-inner">
+      <a href="#" class="nav-logo">
+        <div class="logo-mark">
+          <svg viewBox="0 0 36 36" fill="none" xmlns="http://www.w3.org/2000/svg">
+            <circle cx="18" cy="18" r="18" fill="var(--green-600)"/>
+            <path d="M18 8C18 8 10 14 10 20C10 24.4 13.6 28 18 28C22.4 28 26 24.4 26 20C26 14 18 8 18 8Z" fill="white" opacity="0.9"/>
+            <path d="M18 14V28" stroke="var(--green-600)" stroke-width="1.5" stroke-linecap="round"/>
+            <path d="M18 20L14 16" stroke="var(--green-600)" stroke-width="1.5" stroke-linecap="round"/>
+            <path d="M18 22L22 18" stroke="var(--green-600)" stroke-width="1.5" stroke-linecap="round"/>
+          </svg>
+        </div>
+        <span class="logo-text">CropIQ</span>
+      </a>
+      <div class="nav-links">
+        <a href="#predict">Predict</a>
+        <a href="#results">Results</a>
+        <a href="#footer">About</a>
+        <a href="https://github.com" target="_blank" class="nav-cta">GitHub ↗</a>
+      </div>
+      <button class="hamburger" id="hamburger" aria-label="Toggle menu">
+        <span></span><span></span><span></span>
+      </button>
+    </div>
+    <!-- Mobile menu -->
+    <div class="mobile-menu" id="mobileMenu">
+      <a href="#predict">Predict</a>
+      <a href="#results">Results</a>
+      <a href="#footer">About</a>
+      <a href="https://github.com" target="_blank">GitHub ↗</a>
+    </div>
+  </nav>
 
-  <input id="N" placeholder="Nitrogen (N)">
-  <input id="P" placeholder="Phosphorus (P)">
-  <input id="K" placeholder="Potassium (K)">
-  <input id="temp" placeholder="Temperature">
-  <input id="humidity" placeholder="Humidity">
-  <input id="ph" placeholder="pH">
-  <input id="rainfall" placeholder="Rainfall">
+  <!-- ======================== HERO ======================== -->
+  <section class="hero">
+    <div class="hero-bg-decor">
+      <div class="hero-orb orb-1"></div>
+      <div class="hero-orb orb-2"></div>
+      <div class="hero-grid"></div>
+    </div>
+    <div class="hero-content">
+      <div class="hero-badge">
+        <span class="badge-dot"></span>
+        AI-Powered Agriculture
+      </div>
+      <h1 class="hero-title">
+        Smart Crop<br />
+        <em>Advisory</em> System
+      </h1>
+      <p class="hero-subtitle">
+        AI-powered crop, fertilizer, and irrigation recommendations<br class="hide-sm" />
+        — tailored to your soil and climate conditions.
+      </p>
+      <div class="hero-stats">
+        <div class="stat">
+          <span class="stat-num">98%</span>
+          <span class="stat-label">Accuracy</span>
+        </div>
+        <div class="stat-divider"></div>
+        <div class="stat">
+          <span class="stat-num">50+</span>
+          <span class="stat-label">Crop Types</span>
+        </div>
+        <div class="stat-divider"></div>
+        <div class="stat">
+          <span class="stat-num">Real-time</span>
+          <span class="stat-label">Predictions</span>
+        </div>
+      </div>
+      <a href="#predict" class="hero-cta">
+        Start Predicting
+        <svg viewBox="0 0 20 20" fill="currentColor"><path fill-rule="evenodd" d="M10.293 3.293a1 1 0 011.414 0l6 6a1 1 0 010 1.414l-6 6a1 1 0 01-1.414-1.414L14.586 11H3a1 1 0 110-2h11.586l-4.293-4.293a1 1 0 010-1.414z" clip-rule="evenodd"/></svg>
+      </a>
+    </div>
+    <div class="hero-visual">
+      <div class="visual-card vc-1">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path stroke-linecap="round" stroke-linejoin="round" d="M12 3v1m0 16v1M4.22 4.22l.707.707M18.364 18.364l.707.707M1 12h1M21 12h1M4.22 19.778l.707-.707M18.364 5.636l.707-.707"/><circle cx="12" cy="12" r="4"/></svg>
+        <div>
+          <div class="vc-label">Temperature</div>
+          <div class="vc-value">27.4°C</div>
+        </div>
+      </div>
+      <div class="visual-card vc-2">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path stroke-linecap="round" stroke-linejoin="round" d="M3 15a4 4 0 004 4h9a5 5 0 10-.1-9.999 5.002 5.002 0 10-9.78 2.096A4.001 4.001 0 003 15z"/></svg>
+        <div>
+          <div class="vc-label">Humidity</div>
+          <div class="vc-value">72%</div>
+        </div>
+      </div>
+      <div class="visual-card vc-3">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path stroke-linecap="round" stroke-linejoin="round" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
+        <div>
+          <div class="vc-label">Best Match</div>
+          <div class="vc-value">Rice 94%</div>
+        </div>
+      </div>
+      <div class="visual-ring"></div>
+      <div class="visual-center-icon">
+        <svg viewBox="0 0 64 64" fill="none" xmlns="http://www.w3.org/2000/svg">
+          <circle cx="32" cy="32" r="32" fill="var(--green-100)"/>
+          <path d="M32 14C32 14 20 24 20 34C20 40.627 25.373 46 32 46C38.627 46 44 40.627 44 34C44 24 32 14 32 14Z" fill="var(--green-500)" opacity="0.7"/>
+          <path d="M32 22V46" stroke="var(--green-800)" stroke-width="2" stroke-linecap="round"/>
+          <path d="M32 34L26 28" stroke="var(--green-800)" stroke-width="2" stroke-linecap="round"/>
+          <path d="M32 38L38 32" stroke="var(--green-800)" stroke-width="2" stroke-linecap="round"/>
+        </svg>
+      </div>
+    </div>
+  </section>
 
-  <button onclick="predict()">🚀 Analyze Farm</button>
+  <!-- ======================== MAIN ======================== -->
+  <main class="main-section" id="predict">
 
-  <div id="result" class="result-box"></div>
-  <div id="fertilizer" class="result-box"></div>
-  <div id="water" class="result-box"></div>
-</div>
+    <!-- ---- FORM CARD ---- -->
+    <div class="container">
+      <div class="section-label">Step 01 — Input Parameters</div>
+      <h2 class="section-title">Enter Soil & Climate Data</h2>
+      <p class="section-sub">Provide your soil nutrient levels and current climate conditions for accurate crop recommendations.</p>
 
-<script src="script.js"></script>
+      <div class="form-card" id="formCard">
+        <div class="form-grid">
 
+          <!-- N -->
+          <div class="form-group">
+            <label for="nitrogen">
+              <span class="field-icon n-icon">N</span>
+              Nitrogen (N)
+            </label>
+            <div class="input-wrap">
+              <input type="number" id="nitrogen" name="nitrogen" placeholder="e.g. 90" min="0" max="300" step="0.1" />
+              <span class="unit-badge">mg/kg</span>
+            </div>
+            <span class="field-hint">Typical range: 0 – 300</span>
+          </div>
+
+          <!-- P -->
+          <div class="form-group">
+            <label for="phosphorus">
+              <span class="field-icon p-icon">P</span>
+              Phosphorus (P)
+            </label>
+            <div class="input-wrap">
+              <input type="number" id="phosphorus" name="phosphorus" placeholder="e.g. 42" min="0" max="300" step="0.1" />
+              <span class="unit-badge">mg/kg</span>
+            </div>
+            <span class="field-hint">Typical range: 0 – 300</span>
+          </div>
+
+          <!-- K -->
+          <div class="form-group">
+            <label for="potassium">
+              <span class="field-icon k-icon">K</span>
+              Potassium (K)
+            </label>
+            <div class="input-wrap">
+              <input type="number" id="potassium" name="potassium" placeholder="e.g. 43" min="0" max="300" step="0.1" />
+              <span class="unit-badge">mg/kg</span>
+            </div>
+            <span class="field-hint">Typical range: 0 – 300</span>
+          </div>
+
+          <!-- Temperature -->
+          <div class="form-group">
+            <label for="temperature">
+              <span class="field-icon t-icon">
+                <svg viewBox="0 0 20 20" fill="currentColor"><path fill-rule="evenodd" d="M10 2a1 1 0 00-1 1v7.586l-1.707 1.707A1 1 0 007 13.5V15a3 3 0 006 0v-1.5a1 1 0 00-.293-.707L11 11.086V3a1 1 0 00-1-1z" clip-rule="evenodd"/></svg>
+              </span>
+              Temperature
+            </label>
+            <div class="input-wrap">
+              <input type="number" id="temperature" name="temperature" placeholder="e.g. 20.9" min="-10" max="55" step="0.1" />
+              <span class="unit-badge">°C</span>
+            </div>
+            <span class="field-hint">Typical range: -10 – 55°C</span>
+          </div>
+
+          <!-- Humidity -->
+          <div class="form-group">
+            <label for="humidity">
+              <span class="field-icon h-icon">
+                <svg viewBox="0 0 20 20" fill="currentColor"><path fill-rule="evenodd" d="M5.05 4.05a7 7 0 119.9 9.9A7 7 0 015.05 4.05zM10 3a7 7 0 100 14A7 7 0 0010 3z" clip-rule="evenodd"/><path d="M10 6v1m0 6v1m-4-4h1m6 0h1" stroke="white" stroke-width="1.5" stroke-linecap="round"/></svg>
+              </span>
+              Humidity
+            </label>
+            <div class="input-wrap">
+              <input type="number" id="humidity" name="humidity" placeholder="e.g. 82" min="0" max="100" step="0.1" />
+              <span class="unit-badge">%</span>
+            </div>
+            <span class="field-hint">Typical range: 0 – 100%</span>
+          </div>
+
+          <!-- pH -->
+          <div class="form-group">
+            <label for="ph">
+              <span class="field-icon ph-icon">pH</span>
+              Soil pH
+            </label>
+            <div class="input-wrap">
+              <input type="number" id="ph" name="ph" placeholder="e.g. 6.5" min="0" max="14" step="0.01" />
+              <span class="unit-badge">0–14</span>
+            </div>
+            <span class="field-hint">Typical range: 3.5 – 9.0</span>
+          </div>
+
+          <!-- Rainfall -->
+          <div class="form-group">
+            <label for="rainfall">
+              <span class="field-icon r-icon">
+                <svg viewBox="0 0 20 20" fill="currentColor"><path d="M5.5 16a3.5 3.5 0 01-.369-6.98 4 4 0 117.753-1.977A4.5 4.5 0 1113.5 16h-8z"/></svg>
+              </span>
+              Rainfall
+            </label>
+            <div class="input-wrap">
+              <input type="number" id="rainfall" name="rainfall" placeholder="e.g. 202" min="0" max="4000" step="0.1" />
+              <span class="unit-badge">mm</span>
+            </div>
+            <span class="field-hint">Typical range: 20 – 3000 mm</span>
+          </div>
+
+        </div>
+
+        <!-- Error Banner -->
+        <div class="error-banner" id="errorBanner" role="alert" aria-live="polite">
+          <svg viewBox="0 0 20 20" fill="currentColor"><path fill-rule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7 4a1 1 0 11-2 0 1 1 0 012 0zm-1-9a1 1 0 00-1 1v4a1 1 0 102 0V6a1 1 0 00-1-1z" clip-rule="evenodd"/></svg>
+          <span id="errorMessage">Something went wrong.</span>
+        </div>
+
+        <!-- Buttons -->
+        <div class="form-actions">
+          <button class="btn-predict" id="predictBtn" onclick="handlePredict()">
+            <span class="btn-text">
+              <svg viewBox="0 0 20 20" fill="currentColor"><path d="M10 12a2 2 0 100-4 2 2 0 000 4z"/><path fill-rule="evenodd" d="M.458 10C1.732 5.943 5.522 3 10 3s8.268 2.943 9.542 7c-1.274 4.057-5.064 7-9.542 7S1.732 14.057.458 10zM14 10a4 4 0 11-8 0 4 4 0 018 0z" clip-rule="evenodd"/></svg>
+              Analyze Crop
+            </span>
+            <span class="btn-spinner" id="btnSpinner">
+              <svg class="spinner-svg" viewBox="0 0 24 24" fill="none"><circle cx="12" cy="12" r="10" stroke="currentColor" stroke-width="3" stroke-dasharray="30 70" stroke-linecap="round"/></svg>
+              Analyzing...
+            </span>
+          </button>
+          <button class="btn-reset" id="resetBtn" onclick="handleReset()">
+            <svg viewBox="0 0 20 20" fill="currentColor"><path fill-rule="evenodd" d="M4 2a1 1 0 011 1v2.101a7.002 7.002 0 0111.601 2.566 1 1 0 11-1.885.666A5.002 5.002 0 005.999 7H9a1 1 0 010 2H4a1 1 0 01-1-1V3a1 1 0 011-1zm.008 9.057a1 1 0 011.276.61A5.002 5.002 0 0014.001 13H11a1 1 0 110-2h5a1 1 0 011 1v5a1 1 0 11-2 0v-2.101a7.002 7.002 0 01-11.601-2.566 1 1 0 01.61-1.276z" clip-rule="evenodd"/></svg>
+            Reset
+          </button>
+        </div>
+      </div>
+    </div>
+
+    <!-- ======================== RESULTS ======================== -->
+    <div class="container results-container" id="results" style="display:none;">
+
+      <!-- Success Banner -->
+      <div class="success-banner" id="successBanner">
+        <svg viewBox="0 0 20 20" fill="currentColor"><path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clip-rule="evenodd"/></svg>
+        <span>Analysis complete! Here are your top crop recommendations.</span>
+      </div>
+
+      <div class="section-label">Step 02 — Results</div>
+      <h2 class="section-title">Top 3 Crop Predictions</h2>
+      <p class="section-sub">Based on your soil and climate data, our AI model recommends the following crops.</p>
+
+      <!-- Prediction Cards -->
+      <div class="prediction-grid" id="predictionGrid">
+        <!-- Injected by JS -->
+      </div>
+
+      <!-- Chart -->
+      <div class="chart-card">
+        <div class="chart-header">
+          <div>
+            <div class="section-label" style="margin-bottom:4px">Confidence Analysis</div>
+            <h3 class="chart-title">Prediction Confidence Chart</h3>
+          </div>
+          <div class="chart-legend" id="chartLegend"></div>
+        </div>
+        <div class="chart-wrap">
+          <canvas id="cropChart"></canvas>
+        </div>
+      </div>
+
+    </div>
+  </main>
+
+  <!-- ======================== FOOTER ======================== -->
+  <footer class="footer" id="footer">
+    <div class="footer-inner">
+      <div class="footer-logo">
+        <div class="logo-mark" style="width:32px;height:32px;">
+          <svg viewBox="0 0 36 36" fill="none" xmlns="http://www.w3.org/2000/svg">
+            <circle cx="18" cy="18" r="18" fill="var(--green-600)"/>
+            <path d="M18 8C18 8 10 14 10 20C10 24.4 13.6 28 18 28C22.4 28 26 24.4 26 20C26 14 18 8 18 8Z" fill="white" opacity="0.9"/>
+            <path d="M18 14V28" stroke="var(--green-600)" stroke-width="1.5" stroke-linecap="round"/>
+            <path d="M18 20L14 16" stroke="var(--green-600)" stroke-width="1.5" stroke-linecap="round"/>
+            <path d="M18 22L22 18" stroke="var(--green-600)" stroke-width="1.5" stroke-linecap="round"/>
+          </svg>
+        </div>
+        <span>CropIQ</span>
+      </div>
+      <p class="footer-copy">
+        Built with ♥ by <strong>Your Name</strong> —
+        <a href="https://github.com/yourhandle" target="_blank" class="footer-link">github.com/yourhandle ↗</a>
+      </p>
+      <p class="footer-tagline">Empowering farmers with AI-driven agricultural intelligence.</p>
+    </div>
+  </footer>
+
+  <script src="script.js"></script>
 </body>
 </html>

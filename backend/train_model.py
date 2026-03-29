@@ -25,7 +25,7 @@ df = df.dropna()
 # =========================
 X = df[['N','P','K','temperature','humidity','ph','rainfall']]
 y = df['label']
-
+print("Features:", X.columns)
 # =========================
 # 🔀 SPLIT
 # =========================
