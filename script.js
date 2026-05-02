@@ -155,6 +155,12 @@ function handleReset() {
 // 🔄 NORMALIZE RESPONSE
 // =======================
 function normalizePredictions(data) {
+  if (data?.top_predictions && data.top_predictions.length > 0) {
+    return data.top_predictions.map(item => ({
+      crop: String(item.crop).toUpperCase(),
+      confidence: item.confidence
+    }));
+  }
   if (data?.recommended_crop) {
     return [{
       crop: String(data.recommended_crop).toUpperCase(),
@@ -206,8 +212,10 @@ function renderChart(predictions) {
     data: {
       labels: predictions.map(p => p.crop),
       datasets: [{
-        data: predictions.map(p => p.confidence * 100)
-      }]
+  label: 'Match %',
+  data: predictions.map(p => Math.round(p.confidence * 100)),
+  backgroundColor: ['#2e7d32', '#66bb6a', '#a5d6a7'],
+}]
     }
   });
 }

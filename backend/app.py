@@ -103,12 +103,22 @@ def predict(data: CropInput):
             data.rainfall
         ]])
 
-        prediction = model.predict(features)[0]
+       probabilities = model.predict_proba(features)[0]
+classes = model.classes_
+top3_indices = np.argsort(probabilities)[::-1][:3]
 
-        return {
-            "recommended_crop": str(prediction),
-            "status": "success"
-        }
+top3 = [
+    {
+        "crop": str(classes[i]),
+        "confidence": round(float(probabilities[i]), 4)
+    }
+    for i in top3_indices
+]
+
+return {
+    "top_predictions": top3,
+    "status": "success"
+}
 
     except Exception as e:
         raise HTTPException(status_code=500, detail=str(e))
