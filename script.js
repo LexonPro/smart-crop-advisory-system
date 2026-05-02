@@ -37,7 +37,7 @@ let cropChart = null;
 // =======================
 // 🔥 FETCH WITH RETRY + TIMEOUT
 // =======================
-async function fetchWithRetry(url, options, retries = 3, delay = 4000) {
+async function fetchWithRetry(url, options, retries = 6, delay = 6000) {
   for (let i = 0; i < retries; i++) {
     try {
       const controller = new AbortController();
@@ -124,7 +124,7 @@ async function handlePredict() {
     if (err.name === "AbortError") {
       showError("Server taking too long... please retry.");
     } else if (err.message.includes("Failed to fetch")) {
-      showError("Server waking up... please wait 20–30 seconds.");
+      showError("⏳ Server is starting... please wait (first request may take ~30s)");
     } else {
       showError(err.message || "Something went wrong.");
     }
