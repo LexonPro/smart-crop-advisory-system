@@ -1,7 +1,7 @@
 from fastapi import FastAPI, HTTPException
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.exceptions import RequestValidationError
-from fastapi.responses import JSONResponse
+from fastapi.responses import JSONResponse, PlainTextResponse
 from pydantic import BaseModel, Field, validator
 import joblib
 import numpy as np
@@ -34,17 +34,22 @@ async def validation_exception_handler(request, exc):
     )
 
 # =========================
-# 📦 LOAD MODEL
+# 📦 MODEL CONFIG
 # =========================
 BASE_DIR = os.path.dirname(os.path.abspath(__file__))
 model_path = os.path.join(BASE_DIR, "models", "model.pkl")
 
 model = None
-try:
-    model = joblib.load(model_path)
-    print("✅ Model loaded successfully")
-except Exception as e:
-    print("❌ Model load failed:", e)
+
+def load_model():
+    global model
+    if model is None:
+        try:
+            model = joblib.load(model_path)
+            print("✅ Model loaded successfully")
+        except Exception as e:
+            print("❌ Model load failed:", e)
+            raise HTTPException(status_code=500, detail="Model load failed")
 
 # =========================
 # 📊 INPUT MODEL
@@ -65,19 +70,22 @@ class CropInput(BaseModel):
         return float(v)
 
 # =========================
-# 🏠 ROOT (for UptimeRobot)
+# 🟢 HEALTH CHECK (IMPORTANT)
 # =========================
-@app.get("/")
+@app.get("/", response_class=PlainTextResponse)
 def home():
-    return {"status": "ok", "message": "Backend running 🚀"}
+    return "OK"
+
+@app.get("/health", response_class=PlainTextResponse)
+def health():
+    return "healthy"
 
 # =========================
 # 🌾 PREDICT
 # =========================
 @app.post("/predict")
 def predict(data: CropInput):
-    if model is None:
-        raise HTTPException(status_code=500, detail="Model not loaded")
+    load_model()
 
     try:
         if data.ph > 9:
@@ -101,7 +109,9 @@ def predict(data: CropInput):
         try:
             probabilities = model.predict_proba(features)[0]
             classes = model.classes_
+
             top3_indices = np.argsort(probabilities)[::-1][:3]
+
             top3 = [
                 {
                     "crop": str(classes[i]),
@@ -110,6 +120,7 @@ def predict(data: CropInput):
                 for i in top3_indices
                 if probabilities[i] > 0
             ]
+
         except Exception:
             top3 = [{"crop": str(prediction), "confidence": 1.0}]
 
@@ -168,10 +179,9 @@ def water(data: dict):
     return {"water_advice": advice, "status": "success"}
 
 # =========================
-# 🚀 RUN FOR RENDER
+# 🚀 RUN (RENDER)
 # =========================
 if __name__ == "__main__":
     import uvicorn
-
     port = int(os.environ.get("PORT", 10000))
     uvicorn.run("app:app", host="0.0.0.0", port=port)
