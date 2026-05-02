@@ -80,18 +80,11 @@ def predict(data: CropInput):
         raise HTTPException(status_code=500, detail="Model not loaded")
 
     try:
-        # Optional logic
         if data.ph > 9:
-            return {
-                "recommended_crop": "Soil too alkaline",
-                "status": "warning"
-            }
+            return {"recommended_crop": "Soil too alkaline", "status": "warning"}
 
         if data.ph < 4:
-            return {
-                "recommended_crop": "Soil too acidic",
-                "status": "warning"
-            }
+            return {"recommended_crop": "Soil too acidic", "status": "warning"}
 
         features = np.array([[
             data.N,
@@ -103,22 +96,27 @@ def predict(data: CropInput):
             data.rainfall
         ]])
 
-       probabilities = model.predict_proba(features)[0]
-classes = model.classes_
-top3_indices = np.argsort(probabilities)[::-1][:3]
+        prediction = model.predict(features)[0]
 
-top3 = [
-    {
-        "crop": str(classes[i]),
-        "confidence": round(float(probabilities[i]), 4)
-    }
-    for i in top3_indices
-]
+        try:
+            probabilities = model.predict_proba(features)[0]
+            classes = model.classes_
+            top3_indices = np.argsort(probabilities)[::-1][:3]
+            top3 = [
+                {
+                    "crop": str(classes[i]),
+                    "confidence": round(float(probabilities[i]), 4)
+                }
+                for i in top3_indices
+                if probabilities[i] > 0
+            ]
+        except Exception:
+            top3 = [{"crop": str(prediction), "confidence": 1.0}]
 
-return {
-    "top_predictions": top3,
-    "status": "success"
-}
+        return {
+            "top_predictions": top3,
+            "status": "success"
+        }
 
     except Exception as e:
         raise HTTPException(status_code=500, detail=str(e))
