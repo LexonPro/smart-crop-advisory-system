@@ -1,15 +1,24 @@
 /**
- * Smart Crop Advisory System — script.js
+ * Smart Crop Advisory System — script.js (IMPROVED)
  */
 
-/* NAVBAR */
+// =======================
+// 🔗 API BASE URL
+// =======================
+const API_URL = "https://smart-crop-advisory-system-2.onrender.com";
+
+// =======================
+// NAVBAR
+// =======================
 const navbar = document.getElementById('navbar');
 window.addEventListener('scroll', () => {
   navbar.classList.toggle('scrolled', window.scrollY > 20);
 });
 
-/* HAMBURGER MENU */
-const hamburger  = document.getElementById('hamburger');
+// =======================
+// HAMBURGER MENU
+// =======================
+const hamburger = document.getElementById('hamburger');
 const mobileMenu = document.getElementById('mobileMenu');
 
 hamburger.addEventListener('click', () => {
@@ -20,18 +29,32 @@ mobileMenu.querySelectorAll('a').forEach(link => {
   link.addEventListener('click', () => mobileMenu.classList.remove('open'));
 });
 
-/* CHART */
+// =======================
+// CHART
+// =======================
 let cropChart = null;
 
-/* 🔥 RETRY FUNCTION (NEW) */
+// =======================
+// 🔥 FETCH WITH RETRY + TIMEOUT
+// =======================
 async function fetchWithRetry(url, options, retries = 3, delay = 4000) {
   for (let i = 0; i < retries; i++) {
     try {
-      const response = await fetch(url, options);
-      if (!response.ok) throw new Error(`HTTP ${response.status}`);
+      const controller = new AbortController();
+      const timeout = setTimeout(() => controller.abort(), 15000);
+
+      const response = await fetch(url, {
+        ...options,
+        signal: controller.signal
+      });
+
+      clearTimeout(timeout);
+
       return response;
+
     } catch (err) {
       console.log(`Retry ${i + 1}...`);
+
       if (i < retries - 1) {
         await new Promise(res => setTimeout(res, delay));
       } else {
@@ -41,8 +64,13 @@ async function fetchWithRetry(url, options, retries = 3, delay = 4000) {
   }
 }
 
-/* HANDLE PREDICT */
+// =======================
+// 🚀 HANDLE PREDICT
+// =======================
 async function handlePredict() {
+  const btn = document.getElementById('predictBtn');
+  if (btn.disabled) return; // prevent spam click
+
   const n    = parseFloat(document.getElementById('nitrogen').value);
   const p    = parseFloat(document.getElementById('phosphorus').value);
   const k    = parseFloat(document.getElementById('potassium').value);
@@ -61,7 +89,7 @@ async function handlePredict() {
 
   try {
     const response = await fetchWithRetry(
-      'https://smart-crop-advisory-system-2.onrender.com/predict',
+      `${API_URL}/predict`,
       {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
@@ -76,23 +104,39 @@ async function handlePredict() {
     );
 
     const data = await response.json();
+
+    // 🔥 HANDLE SERVER ERRORS
+    if (!response.ok) {
+      throw new Error(data?.detail || "Server error");
+    }
+
     const predictions = normalizePredictions(data);
 
     if (!predictions || predictions.length === 0) {
       throw new Error('No predictions returned.');
     }
 
-    renderResults(predictions.slice(0, 3));
+    renderResults(predictions);
 
   } catch (err) {
     console.error(err);
-    showError("Server is waking up... please try again.");
+
+    if (err.name === "AbortError") {
+      showError("Server taking too long... please retry.");
+    } else if (err.message.includes("Failed to fetch")) {
+      showError("Server waking up... please wait 20–30 seconds.");
+    } else {
+      showError(err.message || "Something went wrong.");
+    }
+
   } finally {
     setLoading(false);
   }
 }
 
-/* RESET */
+// =======================
+// RESET
+// =======================
 function handleReset() {
   ['nitrogen','phosphorus','potassium','temperature','humidity','ph','rainfall']
     .forEach(id => document.getElementById(id).value = '');
@@ -107,30 +151,31 @@ function handleReset() {
   hideError();
 }
 
-/* NORMALIZE RESPONSE */
+// =======================
+// 🔄 NORMALIZE RESPONSE
+// =======================
 function normalizePredictions(data) {
-  if (Array.isArray(data?.predictions)) {
-    return data.predictions.map(item => ({
-      crop: item.crop || item.label,
-      confidence: item.confidence || item.probability
-    }));
+  if (data?.recommended_crop) {
+    return [{
+      crop: String(data.recommended_crop).toUpperCase(),
+      confidence: 1
+    }];
   }
-
-  if (Array.isArray(data)) {
-    return data;
-  }
-
   return null;
 }
 
-/* RENDER RESULTS */
+// =======================
+// 📊 RENDER RESULTS
+// =======================
 function renderResults(predictions) {
   document.getElementById('results').style.display = 'block';
   renderCards(predictions);
   renderChart(predictions);
 }
 
-/* CARDS */
+// =======================
+// 📦 CARDS
+// =======================
 function renderCards(predictions) {
   const grid = document.getElementById('predictionGrid');
   grid.innerHTML = '';
@@ -138,15 +183,19 @@ function renderCards(predictions) {
   predictions.forEach((item, index) => {
     const card = document.createElement('div');
     card.className = 'pred-card';
+
     card.innerHTML = `
       <h3>#${index + 1} ${item.crop}</h3>
       <p>${Math.round(item.confidence * 100)}%</p>
     `;
+
     grid.appendChild(card);
   });
 }
 
-/* CHART */
+// =======================
+// 📈 CHART
+// =======================
 function renderChart(predictions) {
   const ctx = document.getElementById('cropChart').getContext('2d');
 
@@ -163,7 +212,9 @@ function renderChart(predictions) {
   });
 }
 
-/* LOADING */
+// =======================
+// ⏳ LOADING
+// =======================
 function setLoading(isLoading) {
   const btn = document.getElementById('predictBtn');
 
@@ -176,7 +227,9 @@ function setLoading(isLoading) {
   }
 }
 
-/* ERROR */
+// =======================
+// ❌ ERROR HANDLING
+// =======================
 function showError(msg) {
   document.getElementById('errorMessage').innerText = msg;
 }
